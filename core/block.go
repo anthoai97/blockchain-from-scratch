@@ -31,7 +31,6 @@ type Block struct {
 func NewBlock(h *Header, txx []Transaction) *Block {
 	return &Block{
 		Header: h, Transactions: txx}
-
 }
 
 func (b *Block) Sign(privKey crypto.PrivateKey) error {
