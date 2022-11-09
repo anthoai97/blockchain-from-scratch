@@ -1,63 +1,51 @@
 package core
 
 import (
-	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/anthoai97/blockchain-from-scratch/crypto"
 	"github.com/anthoai97/blockchain-from-scratch/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHeader_Encode_Decode(t *testing.T) {
-	h := &Header{
+func randomBlock(height uint32) *Block {
+	header := &Header{
 		Version:   1,
 		PrevBlock: types.RandomHash(),
-		Timestamp: uint64(time.Now().UnixNano()),
-		Height:    10,
-		Nonce:     98394,
+		Height:    height,
+		Timestamp: time.Now().UnixNano(),
+	}
+	tx := Transaction{
+		Data: []byte("foo"),
 	}
 
-	buf := &bytes.Buffer{}
-	assert.Nil(t, h.EncodeBinary(buf))
-
-	hDecode := &Header{}
-	assert.Nil(t, hDecode.DecodeBinary(buf))
-	assert.Equal(t, h, hDecode)
+	return NewBlock(header, []Transaction{tx})
 }
 
-func TestBlock_Encode_Decode(t *testing.T) {
-	b := &Block{
-		Header: Header{
-			Version:   1,
-			PrevBlock: types.RandomHash(),
-			Timestamp: uint64(time.Now().UnixNano()),
-			Height:    10,
-			Nonce:     98394,
-		},
-		Transactions: nil,
-	}
+func TestSignBlock(t *testing.T) {
+	b := randomBlock(0)
+	privKey := crypto.GeneratePrivateKey()
+	fmt.Println(b.Hash(BlockHasher{}))
+	assert.Nil(t, b.Sign(privKey))
 
-	buf := &bytes.Buffer{}
-	assert.Nil(t, b.EncodeBinary(buf))
-
-	bDecode := &Block{}
-	assert.Nil(t, bDecode.DecodeBinary(buf))
-	assert.Equal(t, b, bDecode)
+	assert.NotNil(t, b.Signature)
 }
 
-func TestBlockHash(t *testing.T) {
-	b := &Block{
-		Header: Header{
-			Version:   1,
-			PrevBlock: types.RandomHash(),
-			Timestamp: uint64(time.Now().UnixNano()),
-			Height:    10,
-			Nonce:     98394,
-		},
-		Transactions: nil,
-	}
+func TestVerifyBlock(t *testing.T) {
+	b := randomBlock(0)
+	privKey := crypto.GeneratePrivateKey()
+	fmt.Println(b.Hash(BlockHasher{}))
+	assert.Nil(t, b.Sign(privKey))
 
-	h := b.Hash()
-	assert.False(t, h.IsZero())
+	assert.NotNil(t, b.Signature)
+	assert.Nil(t, b.Verify())
+
+	otherPrivKey := crypto.GeneratePrivateKey()
+	b.Validator = otherPrivKey.PublicKey()
+	assert.NotNil(t, b.Verify())
+
+	b.Height = 100
+	assert.NotNil(t, b.Verify())
 }
