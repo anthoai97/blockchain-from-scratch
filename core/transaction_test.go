@@ -28,7 +28,17 @@ func TestVerifyTransaction(t *testing.T) {
 	assert.Nil(t, tx.Verify())
 
 	otherPrivateKey := crypto.GeneratePrivateKey()
-	tx.PublicKey = otherPrivateKey.PublicKey()
+	tx.From = otherPrivateKey.PublicKey()
 
 	assert.NotNil(t, tx.Verify())
+}
+
+func randomTxWithSignature(t *testing.T) *Transaction {
+	privateKey := crypto.GeneratePrivateKey()
+	tx := &Transaction{
+		Data: []byte("foo"),
+	}
+
+	assert.Nil(t, tx.Sign(privateKey))
+	return tx
 }
