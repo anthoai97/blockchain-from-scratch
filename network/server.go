@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/anthoai97/blockchain-from-scratch/core"
 	"github.com/anthoai97/blockchain-from-scratch/crypto"
+	"github.com/sirupsen/logrus"
 )
 
 type ServerOpts struct {
@@ -56,6 +58,24 @@ free:
 
 func (s *Server) createNewBlock() error {
 	fmt.Println("create a new block")
+	return nil
+}
+
+func (s *Server) handleTransaction(tx *core.Transaction) error {
+	if err := tx.Verify(); err != nil {
+		return err
+	}
+
+	hash := tx.Hash(core.TxHasher{})
+
+	if s.memPool.Has(hash) {
+		logrus.WithFields(logrus.Fields{"hash": hash}).Info("transaction already in mempool")
+
+		return nil
+	}
+
+	logrus.WithFields(logrus.Fields{"hash": hash}).Info("add the transaction to mempool")
+
 	return nil
 }
 
