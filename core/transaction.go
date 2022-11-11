@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/anthoai97/blockchain-from-scratch/crypto"
+	"github.com/anthoai97/blockchain-from-scratch/types"
 )
 
 type Transaction struct {
@@ -11,6 +12,12 @@ type Transaction struct {
 
 	From      crypto.PublicKey
 	Signature *crypto.Signature
+}
+
+func NewTransaction(data []byte) *Transaction {
+	return &Transaction{
+		Data: data,
+	}
 }
 
 func (tx *Transaction) Sign(privKey crypto.PrivateKey) error {
@@ -34,4 +41,8 @@ func (tx *Transaction) Verify() error {
 	}
 
 	return nil
+}
+
+func (tx *Transaction) Hash(hasher Hasher[*Transaction]) types.Hash {
+	return hasher.Hash(tx)
 }
