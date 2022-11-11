@@ -3,22 +3,28 @@ package network
 import (
 	"fmt"
 	"time"
+
+	"github.com/anthoai97/blockchain-from-scratch/crypto"
 )
 
 type ServerOpts struct {
 	Transports []Transport
+	PrivateKey *crypto.PrivateKey
 }
 
 type Server struct {
 	ServerOpts
-	rpcCh  chan RPC
-	quitCh chan struct{}
+	isValidator bool
+	rpcCh       chan RPC
+	quitCh      chan struct{}
 }
 
 func NewServer(opts ServerOpts) *Server {
 	return &Server{
-		ServerOpts: opts,
-		rpcCh:      make(chan RPC),
+		ServerOpts:  opts,
+		isValidator: opts.PrivateKey != nil,
+		rpcCh:       make(chan RPC),
+		quitCh:      make(chan struct{}),
 	}
 }
 
