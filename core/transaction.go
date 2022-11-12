@@ -15,6 +15,8 @@ type Transaction struct {
 
 	// cache version of data hash
 	hash types.Hash
+	// firstSeen is the timestamp of when this tx is first seen locally
+	fristSeen int64
 }
 
 func NewTransaction(data []byte) *Transaction {
@@ -51,4 +53,12 @@ func (tx *Transaction) Hash(hasher Hasher[*Transaction]) types.Hash {
 		tx.hash = hasher.Hash(tx)
 	}
 	return tx.hash
+}
+
+func (tx *Transaction) SetFirstSeen(t int64) {
+	tx.fristSeen = t
+}
+
+func (tx *Transaction) FirstSeen() int64 {
+	return tx.fristSeen
 }
