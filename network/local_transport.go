@@ -58,3 +58,13 @@ func (t *LocalTransport) Addr() NetAddr {
 func (t *LocalTransport) Peers() map[NetAddr]*LocalTransport {
 	return t.peers
 }
+
+func (t *LocalTransport) Broadcast(payload []byte) error {
+	for _, peer := range t.peers {
+		if err := t.SendMessage(peer.Addr(), payload); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
