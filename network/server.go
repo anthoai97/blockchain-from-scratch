@@ -55,7 +55,7 @@ func NewServer(opts ServerOpts) (*Server, error) {
 	s := &Server{
 		ServerOpts:  opts,
 		chain:       chain,
-		memPool:     NewTxPool(),
+		memPool:     NewTxPool(1000),
 		isValidator: opts.PrivateKey != nil,
 		rpcCh:       make(chan RPC),
 		quitCh:      make(chan struct{}),
@@ -117,7 +117,7 @@ func (s *Server) createNewBlock() error {
 		return err
 	}
 
-	txx := s.memPool.Transactions()
+	txx := s.memPool.Pending()
 
 	block, err := core.NewBlockFromPrevHeader(currentHeader, txx)
 	if err != nil {
@@ -132,7 +132,7 @@ func (s *Server) createNewBlock() error {
 		return err
 	}
 
-	s.memPool.Flush()
+	s.memPool.ClearPending()
 
 	return nil
 }
@@ -182,7 +182,7 @@ func (s *Server) broadcast(payload []byte) error {
 func (s *Server) processTransaction(tx *core.Transaction) error {
 	hash := tx.Hash(core.TxHasher{})
 
-	if s.memPool.Has(hash) {
+	if s.memPool.Contains(hash) {
 		return nil
 	}
 
@@ -192,7 +192,7 @@ func (s *Server) processTransaction(tx *core.Transaction) error {
 
 	tx.SetFirstSeen(time.Now().UnixNano())
 
-	s.Logger.Log("msg", "adding new tx to mempool", "hash", hash, "mempoolLength", s.memPool.Len())
+	s.Logger.Log("msg", "adding new tx to mempool", "hash", hash, "mempoolLength", s.memPool.PendingCount())
 
 	go s.broadcastTx(tx)
 
