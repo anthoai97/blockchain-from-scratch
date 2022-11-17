@@ -28,10 +28,12 @@ func TestVM(t *testing.T) {
 	// 3
 	// push stack
 	// data := []byte{0x03, 0x0a, 0x02, 0x0a, 0x0e}
-	data := []byte{0x03, 0x0a, 0x46, 0x0c, 0x4f, 0x0c, 0x4f, 0x0c, 0x0d}
-	vm := NewVM(data)
+	data := []byte{0x03, 0x0a, 0x46, 0x0c, 0x4f, 0x0c, 0x4f, 0x0c, 0x0d, 0x05, 0x0a, 0x0f}
+	contractState := NewState()
+	vm := NewVM(data, contractState)
 	assert.Nil(t, vm.Run())
-	result := vm.stack.Pop().([]byte)
-
-	assert.Equal(t, "FOO", string(result))
+	valueBytes, err := contractState.Get([]byte("FOO"))
+	value := deserializeInt64(valueBytes)
+	assert.Nil(t, err)
+	assert.Equal(t, value, int64(5))
 }
