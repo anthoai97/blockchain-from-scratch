@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/anthoai97/blockchain-from-scratch/core"
@@ -84,7 +82,7 @@ func initRemoteServers(trs []network.Transport) {
 
 func sendTranasction(tr network.Transport, to network.NetAddr) error {
 	privKey := crypto.GeneratePrivateKey()
-	data := []byte(strconv.FormatInt(int64(rand.Intn(1000000000)), 10))
+	data := []byte{0x02, 0x0a, 0x02, 0x0a, 0x0b}
 	tx := core.NewTransaction(data)
 	tx.Sign(privKey)
 	buf := &bytes.Buffer{}
