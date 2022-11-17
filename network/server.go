@@ -142,7 +142,7 @@ func genesisBlock() *core.Block {
 		Version:   1,
 		DataHash:  types.Hash{},
 		Height:    0,
-		Timestamp: time.Now().UnixNano(),
+		Timestamp: 00000,
 	}
 
 	b, _ := core.NewBlock(header, nil)
