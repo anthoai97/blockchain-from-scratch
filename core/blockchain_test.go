@@ -41,7 +41,7 @@ func TestAddBlock(t *testing.T) {
 
 	lenBlocks := 1000
 	for i := 0; i < lenBlocks; i++ {
-		block := randomBlockWithSignature(t, uint32(i+1), getPreviousBlockHash(t, bc, uint32(i+1)))
+		block := randomBlock(t, uint32(i+1), getPreviousBlockHash(t, bc, uint32(i+1)))
 		assert.Nil(t, bc.AddBlock(block))
 	}
 
@@ -55,7 +55,7 @@ func TestGetHeader(t *testing.T) {
 	bc := newBlockchainWithGenesis(t)
 	lenBlocks := 1000
 	for i := 0; i < lenBlocks; i++ {
-		b := randomBlockWithSignature(t, uint32(i+1), getPreviousBlockHash(t, bc, uint32(i+1)))
+		b := randomBlock(t, uint32(i+1), getPreviousBlockHash(t, bc, uint32(i+1)))
 		assert.Nil(t, bc.AddBlock(b))
 		header, err := bc.GetHeader(uint32(i + 1))
 		assert.Nil(t, err)
@@ -66,6 +66,6 @@ func TestGetHeader(t *testing.T) {
 
 func TestAddBlocToHigh(t *testing.T) {
 	bc := newBlockchainWithGenesis(t)
-	assert.Nil(t, bc.AddBlock(randomBlockWithSignature(t, 1, getPreviousBlockHash(t, bc, uint32(1)))))
-	assert.NotNil(t, bc.AddBlock(randomBlockWithSignature(t, 3, types.Hash{})))
+	assert.Nil(t, bc.AddBlock(randomBlock(t, 1, getPreviousBlockHash(t, bc, uint32(1)))))
+	assert.NotNil(t, bc.AddBlock(randomBlock(t, 3, types.Hash{})))
 }
