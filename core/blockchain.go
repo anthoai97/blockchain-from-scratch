@@ -3,6 +3,8 @@ package core
 import (
 	"fmt"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Blockchain struct {
@@ -62,6 +64,11 @@ func (bc *Blockchain) addBlockWithoutValidation(b *Block) error {
 	bc.lock.Lock()
 	bc.headers = append(bc.headers, b.Header)
 	bc.lock.Unlock()
+
+	logrus.WithFields(logrus.Fields{
+		"height": b.Height,
+		"hash":   b.Hash(BlockHasher{}),
+	}).Info("adding new block")
 
 	return bc.store.Put(b)
 }
